@@ -1,5 +1,12 @@
 # Cairn
 
+[![CI](https://github.com/GautamTalksDev/Cairn/actions/workflows/ci.yml/badge.svg)](https://github.com/GautamTalksDev/Cairn/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/GautamTalksDev/Cairn/badge)](https://scorecard.dev/viewer/?uri=github.com/GautamTalksDev/Cairn)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+
+Cairn evaluates whether a robot's positioning system is **telling the truth about its own uncertainty**.
+
 Cairn evaluates whether a robot’s positioning system is **telling the truth about its own uncertainty**. It measures silently wrong, overconfident poses on real underground trajectories and packages detectors that raise protection levels when geometry or cross-sensor consistency collapses.
 
 ## The problem
