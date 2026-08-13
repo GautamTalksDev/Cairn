@@ -1,0 +1,42 @@
+# Dependabot — weekly dependency and Actions updates (CP-23).
+# Docs: https://docs.github.com/code-security/dependabot
+
+version: 2
+updates:
+  # Python: pyproject.toml + requirements*.txt (including requirements.lock.txt)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    # Bundle all patch-level bumps into one PR instead of N small ones.
+    groups:
+      pip-patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+    ignore:
+      # IMPORTANT: do not raise numpy to 2.x.
+      # evo (data tooling in requirements.lock.txt) depends on numpy, and the
+      # project pins numpy==1.26.4 because gtsam ships compiled bindings built
+      # against that 1.x ABI. A Dependabot major bump to numpy 2.x breaks the
+      # locked evaluation environment. Keep numpy on 1.x until evo/gtsam (and
+      # pyproject.toml) are deliberately migrated together.
+      - dependency-name: "numpy"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions-patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
