@@ -176,7 +176,30 @@ Then branch in `CairnMonitor._assess` on `mode == "my_mode"`.
   false positives appear (see comments in `.pre-commit-config.yaml`).
 - `pip-audit -r requirements.lock.txt` should stay clean, or document an ignore
   in `docs/dependency-audit.md`.
-- Numpy must stay on 1.x (`numpy>=1.26,<2` / pin in lock and Dependabot ignore).
+- Numpy must stay on 1.x (`numpy==1.26.4`). Scipy stays on `1.17.1` (1.18.0
+  breaks tests; both pins sit with gtsam's numpy 1.x ABI). Dependabot ignores
+  numpy major bumps and scipy minor/major bumps.
+
+### Which dependency file is authoritative
+
+Do not edit the three files independently.
+
+| File | Role | When to use |
+| --- | --- | --- |
+| `pyproject.toml` | **Declared pins** (runtime `[project.dependencies]`, optional `[dev]`) | Change versions here first |
+| `requirements.txt` | **Hash-pinned runtime lock** generated from `pyproject.toml` | `pip install --require-hashes -r requirements.txt`; supply-chain / Scorecard |
+| `requirements.lock.txt` | **Evaluation freeze** (evo, gtsam, pytest, and the same runtime pins) | `pip-audit`, SBOM, full data-tooling reproduce |
+
+After any runtime pin change in `pyproject.toml`:
+
+```bash
+pip install pip-tools
+pip-compile --generate-hashes --output-file=requirements.txt pyproject.toml
+```
+
+Then align overlapping names in `requirements.lock.txt` (numpy, scipy,
+matplotlib, PyYAML, and their transitives) to the compiled versions. Extra
+lock-only packages (evo, gtsam, …) are not in `requirements.txt` on purpose.
 
 ## Conduct
 

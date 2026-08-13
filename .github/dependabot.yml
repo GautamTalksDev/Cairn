@@ -27,6 +27,13 @@ updates:
       - dependency-name: "numpy"
         update-types:
           - "version-update:semver-major"
+      # scipy 1.18.0 breaks the test suite. scipy==1.17.1 is pinned in
+      # pyproject.toml alongside numpy==1.26.4 for gtsam ABI compatibility.
+      # Ignore both minor and major bumps until that pair is migrated together.
+      - dependency-name: "scipy"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
 
   - package-ecosystem: "github-actions"
     directory: "/"

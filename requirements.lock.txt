@@ -1,5 +1,15 @@
-# Full environment lock (CP-0), including data tooling (evo, gtsam, pytest, …).
-# Runtime install pins are in pyproject.toml; numpy must stay on 1.x (<2) even though evo also depends on numpy.
+# Full evaluation-environment freeze (CP-0), including data tooling
+# (evo, gtsam, pytest, …) that is *not* a runtime library dependency.
+#
+# Authoritative files (see CONTRIBUTING.md):
+#   pyproject.toml        — declared runtime/dev pins (edit here first)
+#   requirements.txt      — hash-pinned compile of pyproject runtime deps
+#   this file             — extra evaluation stack; overlapping packages MUST
+#                           match pyproject.toml / requirements.txt (numpy,
+#                           scipy, matplotlib, PyYAML, and their transitives).
+#
+# Do not bump numpy or scipy here without the coordinated ABI migration.
+# Runtime install pins are in pyproject.toml; numpy must stay on 1.x (<2).
 apsw==3.53.4.0
 argcomplete==3.7.2
 colorama==0.4.6

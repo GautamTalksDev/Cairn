@@ -27,8 +27,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-# Runtime pins aligned with requirements.lock.txt. numpy stays on 1.x (<2)
-# even though evo (data tooling in the lockfile) also depends on numpy.
+# Runtime pins. Source of truth for *declared* versions. After changing these,
+# regenerate the hash-pinned lock:
+#   pip-compile --generate-hashes --output-file=requirements.txt pyproject.toml
+# numpy stays on 1.x (<2); scipy stays on 1.17.1 (1.18.0 breaks tests; gtsam ABI).
+# See CONTRIBUTING.md. Even though evo (evaluation tooling in
+# requirements.lock.txt) also depends on numpy.
 dependencies = [
     "numpy==1.26.4",
     "matplotlib==3.11.1",

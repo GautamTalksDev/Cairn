@@ -20,8 +20,11 @@ workflow only for that ID.
 | --- | --- | --- | --- |
 | (none) | | | |
 
-## Numpy pin
+## Numpy and scipy pins
 
 Do not upgrade numpy to 2.x via Dependabot or by hand without a coordinated
 migration: evo depends on numpy, and gtsam’s wheels target the numpy 1.26.4
-ABI. See `.github/dependabot.yml`.
+ABI. Do not upgrade scipy past 1.17.1: 1.18.0 breaks the test suite, and it is
+pinned with numpy 1.26.4 for that same ABI. See `.github/dependabot.yml` and
+[CONTRIBUTING.md](../CONTRIBUTING.md) for which of `pyproject.toml`,
+`requirements.txt`, and `requirements.lock.txt` to edit.
