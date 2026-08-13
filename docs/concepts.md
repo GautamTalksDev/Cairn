@@ -43,6 +43,54 @@ still have large MDR (the naive covariance baseline on injected drift). A
 monitor that abstains constantly can drive MDR down by refusing to claim
 `NOMINAL`, at the cost of availability.
 
+### Formal definitions
+
+For each epoch $k$, let $e_k$ be true horizontal error (metres), $\mathrm{PL}_k$
+the horizontal protection level (metres), and $s_k$ the integrity state.
+
+Missed-detection rate (safety-critical):
+
+```math
+\mathrm{MDR}
+= \frac{1}{N}\sum_{k=1}^{N}
+\mathbf{1}\left[e_k > \mathrm{PL}_k \land s_k = \mathrm{NOMINAL}\right]
+```
+
+False-alarm rate:
+
+```math
+\mathrm{FAR}
+= \frac{1}{N}\sum_{k=1}^{N}
+\mathbf{1}\left[
+s_k \in \{\mathrm{DEGRADED}, \mathrm{DO\_NOT\_TRUST}\}
+\land
+e_k \le \mathrm{PL}_k
+\right]
+```
+
+Availability:
+
+```math
+\mathrm{Availability}
+= \frac{1}{N}\sum_{k=1}^{N}
+\mathbf{1}\left[s_k = \mathrm{NOMINAL}\right]
+```
+
+ATE RMSE is the root-mean-square Euclidean position error after optional
+Umeyama SE(3) alignment of the estimate to ground truth.
+
+Naive protection level (CP-7), from the estimator position covariance $C$ with
+chi-squared scaling at confidence $\gamma$ (default 99.9 percent):
+
+```math
+\mathrm{HPL} = \sqrt{\chi^{2}_{\gamma,2} \lambda_{\mathrm{max}}(C_{xy})},\quad
+\mathrm{VPL} = \sqrt{\chi^{2}_{\gamma,1} C_{zz}}
+```
+
+Under the naive baseline the integrity state is always $\mathrm{NOMINAL}$. The
+discrete state takes values in the set
+$\{\mathrm{NOMINAL},\mathrm{DEGRADED},\mathrm{DO\_NOT\_TRUST}\}$.
+
 ## Stanford diagram
 
 The Stanford (or Stanford-ESA) integrity diagram plots true error against

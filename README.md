@@ -59,8 +59,8 @@ demos use **synthetic** faults).
 
 ```mermaid
 flowchart LR
-  A["Early<br/>error low<br/>PL flat<br/>NOMINAL"] --> B["Mid<br/>error rising<br/>PL flat<br/>NOMINAL"]
-  B --> C["Late<br/>error large<br/>PL flat<br/>NOMINAL"]
+  A["Early: error low, PL flat, NOMINAL"] --> B["Mid: error rising, PL flat, NOMINAL"]
+  B --> C["Late: error large, PL flat, NOMINAL"]
 ```
 
 ## What Cairn does in the stack
@@ -73,54 +73,19 @@ flowchart LR
   S[Pose sources] --> C[Cairn]
   C --> R[Integrity report]
   S --> P[Position estimate]
-  C -.->|does not produce or modify| P
+  C -.-> X[Does not modify position]
+  X -.-> P
 ```
 
 ## Metric definitions
 
-Let each epoch $k$ have true horizontal error $e_k$, horizontal protection level
-$\mathrm{PL}_k$, and integrity state
-$s_k \in \{\mathrm{NOMINAL},\mathrm{DEGRADED},\mathrm{DO\_NOT\_TRUST}\}$.
-
-**Missed-detection rate (safety):**
-
-$$
-\mathrm{MDR}
-= \frac{1}{N}\sum_{k=1}^{N}
-\mathbf{1}\!\left[e_k > \mathrm{PL}_k \;\wedge\; s_k=\mathrm{NOMINAL}\right]
-$$
-
-**False-alarm rate (usability):**
-
-$$
-\mathrm{FAR}
-= \frac{1}{N}\sum_{k=1}^{N}
-\mathbf{1}\!\left[
-s_k\in\{\mathrm{DEGRADED},\mathrm{DO\_NOT\_TRUST}\}
-\;\wedge\;
-e_k \le \mathrm{PL}_k
-\right]
-$$
-
-**Availability:**
-
-$$
-\mathrm{Availability}
-= \frac{1}{N}\sum_{k=1}^{N}
-\mathbf{1}\!\left[s_k=\mathrm{NOMINAL}\right]
-$$
-
-**Naive protection level (CP-7):** from the estimator’s position covariance $C$,
-with $\chi^2$ scaling at confidence $\gamma$ (default $99.9\%$):
-
-$$
-\mathrm{HPL}=\sqrt{\chi^2_{\gamma,2}\,\lambda_{\max}(C_{xy})},\qquad
-\mathrm{VPL}=\sqrt{\chi^2_{\gamma,1}\,C_{zz}}
-$$
-
-State is always $\mathrm{NOMINAL}$ (no integrity monitoring).
-
-**ATE RMSE:** after optional Umeyama SE(3) alignment, RMSE of Euclidean position error over time-associated poses.
+Missed detection rate is the fraction of epochs where true error exceeded the
+claimed protection level while the system still reported `NOMINAL`, and it is
+the safety-critical rate. False alarm rate is the fraction of epochs where the
+system alarmed but the position was still within the protection level. Availability
+is the fraction of epochs reported `NOMINAL`. ATE RMSE is root-mean-square
+position error after optional SE(3) alignment. Formal definitions:
+[docs/concepts.md](docs/concepts.md).
 
 ## Current results
 
@@ -132,18 +97,19 @@ duty ≥ 50%). A naive covariance monitor never alarmed, and error reached
 **20.5 m**. These faults were injected synthetically; they are not
 field-observed mine drift. Figure: [`docs/figures/drift_timing.png`](docs/figures/drift_timing.png).
 
-**Sigma sweep on clean CompSLAM (naive baseline).** With a claimed diagonal σ,
-MDR ≤ 0.1% is reachable near **σ\* ≈ 6.94 cm → HPL ≈ 0.258 m (~0.74× ATE)**.
-That is *not* yet a “static covariance is useless” result on this one sequence;
-treat the product case as provisional until multi-sequence + matched-FAR ROC.
-Run `python scripts/sigma_sweep.py` (needs prepared `data/processed/`).
+**Sigma sweep on clean CompSLAM (naive baseline).** With a claimed diagonal
+sigma, MDR ≤ 0.1% is reachable near sigma-star about 6.94 cm (HPL about
+0.258 m, roughly 0.74 times ATE). That is *not* yet a “static covariance is
+useless” result on this one sequence; treat the product case as provisional
+until multi-sequence and matched-FAR ROC. Run `python scripts/sigma_sweep.py`
+(needs prepared `data/processed/`).
 
 **Solution separation (synthetic independent sources).** Configured family-wise
-$P_{FA}=0.05$, 2000 trials: empirical false-alarm rate 5.05%; injected lidar bias
-isolated. See [`RESULTS.md`](RESULTS.md).
+false-alarm probability 0.05, 2000 trials: empirical false-alarm rate 5.05%;
+injected lidar bias isolated. See [`RESULTS.md`](RESULTS.md).
 
-Historical CP-7 tables that used an assumed $\sigma_{xy}=5\,\mathrm{cm}$ (including
-~15% naive MDR) are context only; see [docs/methodology.md](docs/methodology.md).
+Historical CP-7 tables that used an assumed sigma = 5 cm (including about 15%
+naive MDR) are context only; see [docs/methodology.md](docs/methodology.md).
 
 ## Data provenance and licences
 
@@ -169,7 +135,10 @@ Catalogue: [cerberus_darpa_subt_datasets](https://github.com/leggedrobotics/cerb
 
 ## Limitations (read before you cite this)
 
-1. **CERBERUS TUM exports carry no covariance.** CP-7/CP-8 numbers use a **claimed** diagonal self-report ($\sigma_{xy}=5\,\mathrm{cm}$ by default). That is a realistic overconfident LIO prior, not the literal CompSLAM filter matrix. Changing $\sigma$ changes MDR a lot; regenerate RESULTS.md if you change it.
+1. **CERBERUS TUM exports carry no covariance.** CP-7/CP-8 numbers use a
+   **claimed** diagonal self-report (sigma = 5 cm by default). That is a
+   realistic overconfident LIO prior, not the literal CompSLAM filter matrix.
+   Changing sigma changes MDR a lot; regenerate RESULTS.md if you change it.
 2. **CP-8 on trajectory-only bundles does not decode the 24 GB LiDAR bag.** Corridor localizability is obtained by aligning a precomputed ICP-Hessian corridor template with travel direction (straight → corridor, turn → corner). Synthetic cloud unit tests exercise the real Hessian detector; full-bag scan replay is future work.
 3. **Solution separation assumes independent sources.** Shared maps, clocks, or degenerate geometry induce common-mode faults that SS can miss while still looking consistent. It is necessary, not sufficient.
 4. **Umeyama alignment absorbs a global SE(3) bias** before integrity scoring. That is standard for ATE-style comparison but is not a substitute for aligned frames on a live robot.
