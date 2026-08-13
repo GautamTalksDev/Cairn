@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Regenerate RESULTS.md from runnable experiments (do not hand-edit RESULTS.md).
 
-Default sequence: ``examples/quickstart`` (bundled CERBERUS subsample).
+Default sequence: full ``data/processed/anymal_1_1_compslam`` when present,
+else synthetic ``examples/quickstart`` from ``scripts/make_quickstart_data.py``.
 """
 
 from __future__ import annotations

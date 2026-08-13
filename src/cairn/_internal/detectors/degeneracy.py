@@ -352,4 +352,3 @@ class DegeneracyAwareMonitor:
                 comparison="score < score_threshold",
             )
         return float(self.score_threshold), tests, trigger
-

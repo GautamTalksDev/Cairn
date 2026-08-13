@@ -123,4 +123,3 @@ diagnostics:
   # Output path for the JSONL dump when enabled (relative or absolute).
   # Raise verbosity cost only; does not change integrity decisions.
   path: null
-
