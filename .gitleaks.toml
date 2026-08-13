@@ -1,0 +1,26 @@
+# Gitleaks configuration for Cairn (CP-22).
+# Extends the default rule set; allowlist covers documentation examples only.
+
+title = "cairn"
+
+[extend]
+# Use gitleaks built-in rules, then apply allowlists below.
+useDefault = true
+
+[allowlist]
+description = "Known-safe documentation / fixture patterns (not real credentials)"
+paths = [
+  # Hashed findings from detect-secrets; not live secrets.
+  '''(^|/)\.secrets\.baseline$''',
+  # Pre-publication audit may quote example patterns in prose.
+  '''(^|/)SECURITY_AUDIT\.md$''',
+]
+regexes = [
+  # AWS documentation example access key id (not a real key).
+  '''AKIAIOSFODNN7EXAMPLE''',
+  # AWS documentation example secret access key.
+  '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''',
+  # Generic placeholder often used in docs.
+  '''YOUR_API_KEY_HERE''',
+  '''api_key_example''',
+]

@@ -1,0 +1,52 @@
+# Pre-commit hooks for Cairn (CP-22).
+#
+# Install once per clone:
+#   pip install -e ".[dev]"
+#   pre-commit install
+#
+# Run against the whole tree:
+#   pre-commit run --all-files
+#
+# Regenerate the detect-secrets baseline after intentional secret-like strings
+# are added (or after clearing false positives):
+#   detect-secrets scan --baseline .secrets.baseline
+#   # or, full rebuild from tracked files + local security docs (never scan .venv):
+#   detect-secrets scan $(git ls-files) \
+#     CONTRIBUTING.md .gitleaks.toml .pre-commit-config.yaml \
+#     > .secrets.baseline
+# Then review the JSON and commit the updated baseline.
+#
+# All `rev` values are commit SHAs (not floating branch/tag names).
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    # v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # v0.16.2 (matches pyproject.toml / [project.optional-dependencies]dev)
+    rev: 7c55798a78262d14b2074abf623d8a992ebb70d4
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+        # S = bandit security rules (configured in pyproject.toml)
+
+  - repo: https://github.com/Yelp/detect-secrets
+    # v1.5.0
+    rev: 68e8b45440415753fff70a312ece8da92ba85b4a
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: '(^|/)\.secrets\.baseline$'
+
+  - repo: https://github.com/gitleaks/gitleaks
+    # v8.30.1
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e
+    hooks:
+      - id: gitleaks
