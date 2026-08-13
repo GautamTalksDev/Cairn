@@ -9,3 +9,4 @@ build/
 dist/
 data/
 outputs/
+SECURITY_AUDIT.md

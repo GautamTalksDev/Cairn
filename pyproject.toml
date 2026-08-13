@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Integrity monitoring for multi-source robot navigation (protection levels and missed-detection rate)."
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "All rights reserved" }
+license = { text = "Apache-2.0" }
 authors = [
     { name = "GautamTalksDev", email = "developwith.gt@gmail.com" },
 ]
