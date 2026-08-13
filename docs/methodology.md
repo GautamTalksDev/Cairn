@@ -4,6 +4,18 @@ How every published number in this repository was produced, and how to reproduce
 it. This is the document to attack if you are deciding whether to believe the
 results.
 
+Follow the pipeline left to right: raw or synthetic sequence → prepare →
+optional fault injection → monitor → score → artifacts (`RESULTS.md`, plots).
+
+```mermaid
+flowchart LR
+  Raw[Raw or synthetic] --> Prep[Prepare TUM]
+  Prep --> Fault[Optional faults]
+  Fault --> Mon[Monitor]
+  Mon --> Score[Score vs GT]
+  Score --> Out[RESULTS and plots]
+```
+
 ## Dataset
 
 Primary underground sequence: Team CERBERUS DARPA SubT Final Event, robot
@@ -101,6 +113,18 @@ Finding used in limitations: MDR ≤ 0.001 is reachable near σ* ≈ **6.94 cm**
 implied HPL ≈ **0.258 m** (0.74× ATE **0.3463 m**). On this clean sequence a
 well-tuned static covariance can already look adequate. That weakens any claim
 that static covariance is useless without faults.
+
+### Historical context: assumed σ = 5 cm tables
+
+Early CP-7 / CP-8 tables (and older README drafts) reported naive MDR around
+**15%** (for example 15.08% on prepared CompSLAM, or ~15.4% on a quickstart-only
+regeneration) at a **claimed** $\sigma_{xy}=\sigma_z=5\,\mathrm{cm}$. That σ was
+assumed because CERBERUS TUM exports carry no covariance; it is not CompSLAM’s
+filter matrix. Those percentages are sensitive to the assumed σ and are easy to
+misread as a field failure rate. Prefer the sigma-sweep crossing above and the
+drift-timing headline in the README / [`RESULTS.md`](../RESULTS.md). Keep the
+assumed-σ table in [`RESULTS.md`](../RESULTS.md) only as a regenerateable
+artifact, not as the lead claim.
 
 ## Other published tables
 

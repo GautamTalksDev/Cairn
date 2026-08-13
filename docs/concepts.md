@@ -72,6 +72,19 @@ the others. Protection levels rise; state can move to `DEGRADED` or
 `DO_NOT_TRUST`. The report also tracks time since sources last corroborated each
 other.
 
+Look at the separation between the full-set solution and each leave-one-out
+subset: that gap is the test statistic the consistency monitor thresholds.
+
+```mermaid
+flowchart TB
+  Src[Sources A B C] --> Full[Full-set solution]
+  Src --> L1[Leave out A]
+  Src --> L2[Leave out B]
+  Full --> Stat[Separation statistic]
+  L1 --> Stat
+  L2 --> Stat
+```
+
 The method rests on an **independence assumption**: faults should not hit every
 source the same way at the same time. Cross-checks see disagreement. They do
 not see a shared lie.
@@ -116,6 +129,19 @@ together, not by MDR alone.
 - `NOMINAL`: solution treated as usable under the published PL.
 - `DEGRADED`: usable only with caution; PL inflated or consistency stressed.
 - `DO_NOT_TRUST`: do not use the solution for safety-critical decisions.
+
+Watch which edge fires: soft inconsistency moves you to `DEGRADED`; hard reject
+or a clear faulted source moves you to `DO_NOT_TRUST`.
+
+```mermaid
+stateDiagram-v2
+  [*] --> NOMINAL
+  NOMINAL --> DEGRADED: soft inconsistency / PL inflate
+  DEGRADED --> NOMINAL: sources agree again
+  NOMINAL --> DO_NOT_TRUST: hard reject / faulted source
+  DEGRADED --> DO_NOT_TRUST: severe fault / DNT threshold
+  DO_NOT_TRUST --> NOMINAL: inputs recover
+```
 
 See [how-it-works.md](how-it-works.md) for a shorter API-oriented summary and
 [limitations.md](limitations.md) for what these ideas do not buy you in the
