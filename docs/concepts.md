@@ -45,7 +45,7 @@ monitor that abstains constantly can drive MDR down by refusing to claim
 
 ### Formal definitions
 
-For each epoch $k$, let $e_k$ be true horizontal error (metres), $\mathrm{PL}_k$
+For each epoch $k$, let $e_k$ be true horizontal error (metres), $\mathrm{PL}_{k}$
 the horizontal protection level (metres), and $s_k$ the integrity state.
 
 Missed-detection rate (safety-critical):
@@ -53,7 +53,7 @@ Missed-detection rate (safety-critical):
 ```math
 \mathrm{MDR}
 = \frac{1}{N}\sum_{k=1}^{N}
-\mathbf{1}\left[e_k > \mathrm{PL}_k \land s_k = \mathrm{NOMINAL}\right]
+\mathbf{1}\left[e_k > \mathrm{PL}_{k} \land s_k = \texttt{NOMINAL}\right]
 ```
 
 False-alarm rate:
@@ -62,9 +62,9 @@ False-alarm rate:
 \mathrm{FAR}
 = \frac{1}{N}\sum_{k=1}^{N}
 \mathbf{1}\left[
-s_k \in \{\mathrm{DEGRADED}, \mathrm{DO\_NOT\_TRUST}\}
+s_k \in \{\texttt{DEGRADED}, \texttt{DO\_NOT\_TRUST}\}
 \land
-e_k \le \mathrm{PL}_k
+e_k \le \mathrm{PL}_{k}
 \right]
 ```
 
@@ -73,7 +73,7 @@ Availability:
 ```math
 \mathrm{Availability}
 = \frac{1}{N}\sum_{k=1}^{N}
-\mathbf{1}\left[s_k = \mathrm{NOMINAL}\right]
+\mathbf{1}\left[s_k = \texttt{NOMINAL}\right]
 ```
 
 ATE RMSE is the root-mean-square Euclidean position error after optional
@@ -87,9 +87,12 @@ chi-squared scaling at confidence $\gamma$ (default 99.9 percent):
 \mathrm{VPL} = \sqrt{\chi^{2}_{\gamma,1} C_{zz}}
 ```
 
-Under the naive baseline the integrity state is always $\mathrm{NOMINAL}$. The
+Under the naive baseline the integrity state is always $\texttt{NOMINAL}$. The
 discrete state takes values in the set
-$\{\mathrm{NOMINAL},\mathrm{DEGRADED},\mathrm{DO\_NOT\_TRUST}\}$.
+
+```math
+\{\texttt{NOMINAL},\texttt{DEGRADED},\texttt{DO\_NOT\_TRUST}\}
+```
 
 ## Stanford diagram
 
