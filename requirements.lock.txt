@@ -1,3 +1,5 @@
+# Full environment lock (CP-0), including data tooling (evo, gtsam, pytest, …).
+# Runtime install pins are in pyproject.toml; numpy must stay on 1.x (<2) even though evo also depends on numpy.
 apsw==3.53.4.0
 argcomplete==3.7.2
 colorama==0.4.6

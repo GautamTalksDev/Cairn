@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_slow:
+        description: "Run slow tests and reproduce_all.py (needs data/processed)"
+        type: boolean
+        default: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package (dev)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff
+        run: ruff check src tests scripts
+
+      - name: Mypy (public surface)
+        run: mypy
+
+      - name: Pytest (fast)
+        run: pytest -q -m "not slow"
+
+  release-hygiene:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_slow
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package (dev)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Require processed data
+        run: |
+          test -f data/processed/anymal_1_1_compslam/est.tum \
+            && test -f data/processed/anymal_1_1_compslam/gt.tum \
+            || {
+              echo "::error::Manual release job needs data/processed/anymal_1_1_compslam/{est,gt}.tum"
+              exit 1
+            }
+
+      - name: Pytest (slow)
+        run: pytest -q -m slow
+
+      - name: Reproduce all
+        run: python scripts/reproduce_all.py --seed 0

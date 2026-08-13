@@ -1,0 +1,161 @@
+{
+  "_meta": {
+    "comment": "Golden headline numbers for CP-12 end-to-end regression. Regenerated against current monitors after the consistency PL fix (HPL tracks disagreement). Relative tolerance in the test is 1e-3. Synthetic-fault entries are not field-observed mine data.",
+    "sequence_root": "data/processed",
+    "align": "umeyama",
+    "confidence": 0.999,
+    "alert_limit_m": 2.0,
+    "score_threshold": 0.25,
+    "drift_rate_m_per_s": 0.02,
+    "drift_start_frac": 0.3
+  },
+  "sigma_star_m": {
+    "value": 0.06938151515151515,
+    "comment": "\u03c3* from outputs/sigma_sweep: claimed horizontal \u03c3 where naive MDR first drops to \u22640.1% on clean anymal_1 (CP-7 / sigma_sweep)."
+  },
+  "clean_anymal_1": {
+    "sequence": "anymal_1_1_compslam",
+    "ate_rmse_m": {
+      "value": 0.3462739927587176,
+      "comment": "Umeyama-aligned ATE RMSE on clean CompSLAM vs CERBERUS GT (CP-6)."
+    },
+    "naive": {
+      "missed_detection_rate": {
+        "value": 0.00035097571248069636,
+        "comment": "Naive@\u03c3* MDR on clean data \u2014 near-zero; well-tuned static cov looks safe (sigma_sweep / multiseq)."
+      },
+      "false_alarm_rate": {
+        "value": 0.0,
+        "comment": "Naive never leaves NOMINAL \u21d2 FAR \u2261 0 by construction."
+      },
+      "availability": {
+        "value": 1.0,
+        "comment": "Always NOMINAL."
+      },
+      "mean_pl_m": {
+        "value": 0.257885693162688,
+        "comment": "\u03c7\u00b2 HPL at \u03c3* \u2248 0.26 m (~0.74\u00d7 ATE)."
+      }
+    },
+    "degeneracy": {
+      "missed_detection_rate": {
+        "value": 0.0,
+        "comment": "MDR\u22480 on clean data \u2014 demoted; P95 PL inflation is the tell (CP-8 demotion)."
+      },
+      "false_alarm_rate": {
+        "value": 0.09293836866488839,
+        "comment": "Corridor-proxy alarms on clean data."
+      },
+      "mean_pl_m": {
+        "value": 0.5205416212856153,
+        "comment": "Mean PL ~2\u00d7 naive \u2014 inflation / cowardice on clean run."
+      },
+      "p95_pl_m": {
+        "value": 1.8726853328328885,
+        "comment": "P95 PL \u2248 5\u00d7 ATE \u2014 primary demotion evidence."
+      }
+    },
+    "consistency": {
+      "missed_detection_rate": {
+        "value": 0.0,
+        "comment": "No missed detections on clean CompSLAM at \u03c3*."
+      },
+      "false_alarm_rate": {
+        "value": 0.1356872104450372,
+        "comment": "Baseline SS FAR from synthetic primary/prop/lag sources (~14%)."
+      },
+      "availability": {
+        "value": 0.8643127895549628,
+        "comment": "1 \u2212 alarm rate on clean data."
+      }
+    }
+  },
+  "drift_injected": {
+    "sequence": "anymal_1_1_compslam_drift",
+    "comment": "SYNTHETIC along-track drift (0.02 m/s from 30% mark) via scripts/inject_faults.py \u2014 not observed mine drift.",
+    "ate_rmse_m": {
+      "value": 9.617884362385501,
+      "comment": "ATE after synthetic drift \u2014 headline hard case."
+    },
+    "naive": {
+      "missed_detection_rate": {
+        "value": 0.9438438860030886,
+        "comment": "Headline: naive@\u03c3* misses ~94% of epochs under synthetic drift (multiseq / product claim)."
+      },
+      "false_alarm_rate": {
+        "value": 0.0,
+        "comment": "Still never alarms."
+      },
+      "availability": {
+        "value": 1.0,
+        "comment": "Always NOMINAL while error grows to ~20 m."
+      }
+    },
+    "degeneracy": {
+      "missed_detection_rate": {
+        "value": 0.8776498666292293,
+        "comment": "Still ~88% MDR \u2014 demoted; does not catch drift."
+      },
+      "false_alarm_rate": {
+        "value": 0.046749964902428755,
+        "comment": "Some alarms but not drift-responsive (duty never reaches 50%)."
+      }
+    },
+    "consistency": {
+      "missed_detection_rate": {
+        "value": 0.11561139969114137,
+        "comment": "Headline: consistency MDR ~12% under synthetic drift vs naive 94% (order-of-magnitude claim)."
+      },
+      "false_alarm_rate": {
+        "value": 0.07595114418082269,
+        "comment": "FAR after PL-grows-with-disagreement fix (CP-9 PL bugfix)."
+      },
+      "availability": {
+        "value": 0.24554260845149517,
+        "comment": "~25% availability \u2014 abstention objection; answered by drift-timing duty metric."
+      },
+      "mean_pl_m": {
+        "value": 3.655742189650056,
+        "comment": "Mean HPL after PL fix \u2014 grows with disagreement (was frozen at 0.485 m)."
+      },
+      "p95_pl_m": {
+        "value": 12.744384547037068,
+        "comment": "P95 HPL under drift \u2014 PL tracks source disagreement."
+      }
+    }
+  },
+  "common_mode": {
+    "comment": "SYNTHETIC common-mode drift: same epoch offset applied to primary/prop/lag (CP-9 independence limitation). scripts/common_mode_fault.py.",
+    "missed_detection_rate": {
+      "value": 0.7319949459497402,
+      "comment": "Consistency misses common-mode faults \u2014 MDR ~73% (limitations slide)."
+    },
+    "false_alarm_rate": {
+      "value": 0.024287519303664188,
+      "comment": "Low FAR; monitor stays mostly NOMINAL while wrong."
+    },
+    "availability": {
+      "value": 0.8643127895549628,
+      "comment": "Stays available \u2014 confidently wrong."
+    },
+    "alarm_fraction_after_onset": {
+      "value": 0.09044419933821317,
+      "comment": "~9% alarmed post-onset vs ~97% for single-source control \u2014 discriminating signal."
+    }
+  },
+  "drift_timing": {
+    "comment": "Product metric: rolling 5 s alarm duty \u2265 50%, full post-onset window (CP-11). SYNTHETIC drift.",
+    "consistency_time_to_detection_s": {
+      "value": 12.099263191223145,
+      "comment": "\u0394t after drift onset until duty\u226550% \u2014 ARA headline (~12 s)."
+    },
+    "consistency_true_error_at_detection_m": {
+      "value": 0.536518988727454,
+      "comment": "True horizontal error at detection (~0.54 m) vs naive never-alarm max ~20.5 m."
+    },
+    "consistency_detected": {
+      "value": true,
+      "comment": "Must detect under the headline duty rule."
+    }
+  }
+}

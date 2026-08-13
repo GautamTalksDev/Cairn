@@ -1,0 +1,126 @@
+# Cairn default configuration (CP-15)
+# Partners: copy this file, retune, and pass --config <path>.
+# Units and tradeoffs are documented inline. Dump the *effective* config
+# alongside every results run (the CLI writes config.yaml automatically).
+
+integrity:
+  # Chi-squared confidence for naive / degeneracy protection levels (dimensionless).
+  # Raise → larger PL (safer, less useful). Lower → tighter PL (more MDR risk).
+  chi2_confidence: 0.999
+
+  # Family-wise false-alarm probability for solution separation (dimensionless).
+  # Raise → more alarms / lower availability. Lower → quieter, higher MDR risk.
+  p_fa: 0.05
+
+  # Chi-squared confidence used inside the SS protection-level bound (dimensionless).
+  # Usually matched to chi2_confidence; raise → larger SS HPL/VPL.
+  pl_confidence: 0.999
+
+  # Stanford-diagram horizontal alert limit (metres).
+  # Raise → fewer HMI classifications. Lower → stricter ops limit.
+  alert_limit_m: 2.0
+
+  # Finite fallback PL when an epoch is DO_NOT_TRUST / uncomputable (metres).
+  # Must be large vs any real error; never NaN. Lower only if you understand MDR math.
+  untrusted_pl_m: 1000000.0
+
+window:
+  # Max epochs retained by the streaming monitor (count).
+  # Raise → longer hold-over memory / more RAM. Lower → forget sources sooner.
+  max_epochs: 100
+
+  # Max age of retained epochs (seconds).
+  # Raise → longer temporal context. Lower → tighter real-time footprint.
+  max_seconds: 10.0
+
+  # Reuse a missing source's last sample if younger than this (seconds).
+  # Raise → tolerate slower sensors. Lower (or 0) → require every source each tick.
+  holdover_max_dt_s: 0.5
+
+timing:
+  # Rolling window for duty-cycle time-to-detection (seconds).
+  # Raise → slower but stabler detection declarations. Lower → faster, noisier.
+  duty_window_s: 5.0
+
+  # Fraction of the window that must be alarmed to declare detection (dimensionless).
+  # Raise → stricter detection (later Δt). Lower → earlier detection, more FAR sensitivity.
+  duty_threshold: 0.50
+
+  # If true, only evaluate duty once the full window lies after fault onset.
+  # true → blocks pre-fault FAR leakage into Δt. false → allows early contaminated Δt.
+  require_full_post_onset_window: true
+
+degeneracy:
+  # Localizability score below which an axis is "weak" → DEGRADED (dimensionless 0–1).
+  # Raise → more DEGRADED flags. Lower → only flag severe under-constraint.
+  score_threshold: 0.25
+
+  # Score below which state becomes DO_NOT_TRUST (dimensionless 0–1; must be < score_threshold).
+  # Raise → more DNT. Lower → reserve DNT for near-zero information.
+  dnt_threshold: 0.08
+
+  # Floor on localizability when inflating covariance (dimensionless).
+  # Raise → less aggressive inflation. Lower → larger PL in weak directions.
+  loc_floor: 0.05
+
+  # Cap on per-axis std inflation factor (dimensionless).
+  # Raise → allow huge PL in corridors. Lower → limit cowardice / PL blow-up.
+  max_inflation: 50.0
+
+association:
+  # Max |Δt| when matching report timestamps to GT / multi-rate sources (seconds).
+  # Raise → tolerate clock skew. Lower → stricter sync, more match failures.
+  max_dt_s: 0.05
+
+  # Warn when consecutive poses in one stream jump by more than this (seconds).
+  # Raise → fewer gap warnings. Lower → flag brief dropouts.
+  gap_warn_s: 1.0
+
+  # Max |Δt| for trajectory association in ATE/RPE (seconds).
+  # Raise → more matches on sparse GT. Lower → stricter pairing.
+  alignment_max_dt_s: 0.02
+
+default_covariance:
+  # Claimed horizontal position σ when a source omits covariance (metres).
+  # Raise → larger naive PL / lower MDR. Lower → tighter PL / higher MDR.
+  std_xy_m: 0.05
+
+  # Claimed vertical position σ (metres). Same tradeoff as std_xy_m.
+  std_z_m: 0.05
+
+  # Claimed orientation σ per Euler axis (radians).
+  # Raise → larger rotational uncertainty. Rarely drives HPL.
+  std_rot_rad: 0.05
+
+# Optional per-source overrides of default_covariance (same fields).
+# Example:
+# per_source_covariance:
+#   lidar:
+#     std_xy_m: 0.04
+#     std_z_m: 0.04
+#     std_rot_rad: 0.05
+per_source_covariance: {}
+
+monitor:
+  # Streaming backend: naive | consistency | degeneracy.
+  # consistency is the product path; naive is the static-cov baseline.
+  mode: consistency
+
+  # For naive/degeneracy: which estimates dict key is primary (or null = auto).
+  # Set explicitly when multiple sources are present but only one should drive PL.
+  primary_source: null
+
+evaluation:
+  # Trajectory alignment before true-error scoring: none | origin | umeyama.
+  # umeyama removes SE(3) gauge freedom for ATE; none compares raw frames.
+  align_mode: umeyama
+
+diagnostics:
+  # Write one JSON line per epoch (test stats, threshold, PL, state, reason).
+  # false → no file I/O (default). true → verbose; required for offline replay plots.
+  enabled: false
+
+  # Output path for the JSONL dump when enabled (relative or absolute).
+  # Raise verbosity cost only; does not change integrity decisions.
+  path: null
+

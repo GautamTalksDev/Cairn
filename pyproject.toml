@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cairn"
+version = "0.1.0"
+description = "Integrity monitoring for multi-source robot navigation (protection levels and missed-detection rate)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "All rights reserved" }
+authors = [
+    { name = "GautamTalksDev", email = "developwith.gt@gmail.com" },
+]
+keywords = [
+    "integrity",
+    "robotics",
+    "navigation",
+    "SLAM",
+    "protection-level",
+    "underground",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# Runtime pins aligned with requirements.lock.txt. numpy stays on 1.x (<2)
+# even though evo (data tooling in the lockfile) also depends on numpy.
+dependencies = [
+    "numpy==1.26.4",
+    "matplotlib==3.11.1",
+    "scipy==1.17.1",
+    "PyYAML==6.0.3",
+]
+
+[project.optional-dependencies]
+# Runtime is the default [project.dependencies] set above.
+# Dev tools only — not installed by `pip install .`
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.2",
+    "mypy==2.3.0",
+    "types-PyYAML==6.0.12.20260724",
+]
+
+[project.scripts]
+cairn = "cairn.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cairn = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "slow: end-to-end regression against golden headline numbers (needs data/processed)",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["cairn"]
+exclude = "(?x)(^cairn/_internal/)"
+
+[[tool.mypy.overrides]]
+module = [
+    "cairn._internal",
+    "cairn._internal.*",
+]
+ignore_errors = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "scipy.*"]
+ignore_missing_imports = true
