@@ -98,11 +98,24 @@ position error after optional SE(3) alignment. Formal definitions:
 
 Full tables and regenerate commands live in [`RESULTS.md`](RESULTS.md).
 
-**Drift detection (synthetic along-track drift on CompSLAM).** Consistency left
-`NOMINAL` **12 s** after onset when true error was **0.54 m** (rolling 5 s alarm
-duty ≥ 50%). A naive covariance monitor never alarmed, and error reached
-**20.5 m**. These faults were injected synthetically; they are not
-field-observed mine drift. Figure: [`docs/figures/drift_timing.png`](docs/figures/drift_timing.png).
+**Drift detection (synthetic, corrected 10 Oct 2026).** I'm withdrawing the
+earlier 12 s headline. On the same clean sequence with no drift injected at all,
+the consistency monitor crosses the same 5 s / 50% alarm duty threshold 12.9 s
+after the same onset, so that number never showed drift detection. Across 8
+onset points, the share of time in alarm after onset is 91 to 98% with the
+injected drift and 5 to 12% without it. The injector re-aims the drift along
+each 10 Hz step, which makes it jump around; a smooth drift in one fixed
+direction looks the same as clean. The three consistency sources in this
+experiment all come from the one CompSLAM trajectory (current pose, constant
+velocity prediction, pose from 1 s earlier), not independent sensors. The naive
+covariance monitor never alarmed (error reached **20.5 m**), but it can't alarm
+by construction. All of this is synthetic, not field-observed mine drift.
+Details in [`docs/methodology.md`](docs/methodology.md). Figure:
+[`docs/figures/drift_timing.png`](docs/figures/drift_timing.png).
+
+Rerun the no-drift check yourself (needs prepared `data/processed/`, about a
+minute on my laptop): `python scripts/smooth_drift_check.py`. It writes
+`outputs/smooth_drift_check.json`; look at `"clean(no drift)"`.
 
 **Sigma sweep on clean CompSLAM (naive baseline).** With a claimed diagonal
 sigma, MDR ≤ 0.1% is reachable near sigma-star about 6.94 cm (HPL about
